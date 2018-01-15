@@ -1,0 +1,9 @@
+{% if latest_elements_list %}
+    <ul>
+    {% for element in latest_elements_list %}
+        <li><a href="{% url 'gallery:detail' element.id %}">{{ element.header }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
