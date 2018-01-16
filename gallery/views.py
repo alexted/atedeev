@@ -10,19 +10,18 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Elements
 
 #здесь показываем Категории
-def index(request):
-    latest_elements_list = Elements.objects.order_by('-date_time')[:6]
-
+def index(request, category_name):
+    projects_list = Elements.objects.filter(category=category_name).order_by('-date_time')[:6]
     context = {
-        'latest_elements_list': latest_elements_list,
+        'projects_list': projects_list,
     }
-    return render(request, 'gallery/index.html',context)
+    #paginator = Paginator(projects, 6)
+    #page = request.GET.get('page')
+    return render(request, 'gallery/index.html', context)
 
 #Здесь показываем проекты в зависимости от категории
-def detail(request, element_id):
-    projects = get_object_or_404(Elements, pk=element_id)
-    paginator = Paginator(projects, 6)
-    page = request.GET.get('page')
+def detail(request, slug_header):
+    project = get_object_or_404(Elements, slug_header = slug_header)
     return render(request, 'gallery/detail.html', {'project': project})
 
 # Здесь показываем конкретный проект
