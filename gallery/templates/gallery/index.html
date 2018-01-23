@@ -1,9 +1,33 @@
-{% if projects_list %}
+
+{% if projects %}
     <ul>
-    {% for element in projects_list %}
-        <li><a href="{% url 'gallery:detail' element.slug_header %}"><img src="/media/{{ element.preview_image }}" alt="Картинка"></a></li>
+    {% for project in projects%}
+        <li><a href="{% url 'gallery:detail' project.slug_header %}"><img src="/media/{{ project.preview_image }}" alt="Картинка"></a></li>
     {% endfor %}
     </ul>
 {% else %}
     <p>No polls are available.</p>
+{% endif %}
+
+
+{% if projects.has_other_pages %}
+  <ul class="pagination">
+    {% if projects.has_previous %}
+      <li><a href="?page={{ projects.previous_page_number }}">&laquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&laquo;</span></li>
+    {% endif %}
+    {% for i in projects.paginator.page_range %}
+      {% if projects.number == i %}
+        <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+      {% else %}
+        <li><a href="?page={{ i }}">{{ i }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if projects.has_next %}
+      <li><a href="?page={{ projects.next_page_number }}">&raquo;</a></li>
+    {% else %}
+      <li class="disabled"><span>&raquo;</span></li>
+    {% endif %}
+  </ul>
 {% endif %}
