@@ -44,7 +44,7 @@ class Images(models.Model):
         help_text="Загрузите изображения",
         blank=True)
 
-    def resize(self, width=None, height=None):
+    def resize(self, width=None, height=None, type = 'jpg', qual = 90):
         img = Image.open(self.image)
         if height is None:
             basewidth = width
@@ -61,9 +61,12 @@ class Images(models.Model):
         path = MEDIA_ROOT + "/prewiew_images/%s-%s" % (width, height)
         if not os.path.exists(path):
             os.makedirs(path)
-        path = path + "/%s.jpg" % self.pk
-        print(path)
-        resized_img.save(path)
+        path = path + "/%s.%s" % (self.pk, type)
+        #imgpath = self.image.replace(self.image.split('.')[-1],type)
+        if type == 'jpg':
+            resized_img.convert('RGB').save(path, quality=qual)
+        else:
+            resized_img.convert('RGB').save(path)
 
     def save(self):
 
