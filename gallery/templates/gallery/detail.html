@@ -1,5 +1,13 @@
 <h1>{{ project.header }}</h1>
 <p>{{project.description}}</p>
+
+
+<ul>
+{% for img in project.images_set.all %}
+   <li><img src={{img.image.url}} alt="Картинка"></li>
+{%endfor%}
+</ul>
+
 <img src="/media/{{ project.preview_image }}" alt="Картинка">
 <a href="{{project.url}}">{{project.url}}</a>
 

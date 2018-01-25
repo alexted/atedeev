@@ -58,7 +58,7 @@ class Images(models.Model):
             resized_img = img.resize((width_size, baseheight), Image.ANTIALIAS)
         else:
             resized_img = ImageOps.fit(img, (width, height), Image.ANTIALIAS)
-        path = MEDIA_ROOT + "/prewiew_images/%s-%s" % (width, height)
+        path = MEDIA_ROOT + "/preview_images/%s-%s" % (width, height)
         if not os.path.exists(path):
             os.makedirs(path)
         path = path + "/%s.%s" % (self.pk, type)
