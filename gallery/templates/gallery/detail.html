@@ -4,7 +4,7 @@
 
 <ul>
 {% for img in project.images_set.all %}
-   <li><img src={{img.image.url}} alt="Картинка"></li>
+   <li><img src={{img.get_prev_url_300}} alt="Картинка"></li>
 {%endfor%}
 </ul>
 

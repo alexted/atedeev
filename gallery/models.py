@@ -1,11 +1,10 @@
 from django.db import models
 import datetime
-import os, errno
+import os
+from pathlib import Path
 from PIL import Image, ImageOps
-from io import BytesIO
-from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
-from testsite.settings import MEDIA_ROOT
+from testsite.settings import MEDIA_ROOT, MEDIA_URL
 
 # Create your models here.
 class Elements(models.Model):
@@ -62,7 +61,6 @@ class Images(models.Model):
         if not os.path.exists(path):
             os.makedirs(path)
         path = path + "/%s.%s" % (self.pk, type)
-        #imgpath = self.image.replace(self.image.split('.')[-1],type)
         if type == 'jpg':
             resized_img.convert('RGB').save(path, quality=qual)
         else:
@@ -73,12 +71,19 @@ class Images(models.Model):
         if not self.pk or not self.image:
             super(Images, self).save()
             self.resize(width=300)
-            self.resize(height=300)
+            self.resize(width=None, height=300)
             self.resize(width=900,height=220)
             self.resize(width=220, height=900)
             self.resize(width=968, height=115)
 
+    def get_prev_url(self, width=None, height=None, type = 'jpg' ):
+        imgpath = "preview_images/%s-%s/%s.%s" % (width, height, self.pk, type)
+        file = Path(MEDIA_ROOT+imgpath)
+        if file.exists():
+            return MEDIA_URL+imgpath
+        else:
+            self.resize(width,height,type)
+            return MEDIA_URL+imgpath
 
-
-
-
+    def get_prev_url_300(self):
+        return self.get_prev_url(width=600)
