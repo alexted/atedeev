@@ -1,13 +1,17 @@
 <h1>Форма обратной связи</h1>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+{% if thanks %}<p><strong>Спасибо, ваше обращение принято</strong></p>{% endif %}
 
 <form action="{% url 'feedback:index' %}" method="post">
 {% csrf_token %}
-<p><input name="username" id="user"/><label for="username">Ваше имя</label><br>
-<input name="phone_number" id="phone_number"/><label for="phone_number">Номер телефона</label><br>
-<input name="email" id="email"/><label for="email">Электронная почта</label><br>
-<input name="company" id="company"/><label for="company">Организация</label><br>
-<input name="message" id="message"/><label for="message">Сообщение</label></p>
+
+{{form.as_p}}
+<!---
+<p><label for="username">Ваше имя: </label><input name="username" id="username"/><br>
+<label for="phone_number">Номер телефона :</label><input name="phone_number" id="phone_number"/><br>
+<label for="email">Электронная почта :</label><input name="email" id="email"/><br>
+<label for="company">Организация :</label><input name="company" id="company"/><br>
+<label for="message">Сообщение :</label><input name="message" id="message"/></p>
+/--->
 <input type="submit" value="Отправить"/>
 </form>
