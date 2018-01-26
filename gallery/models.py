@@ -3,7 +3,6 @@ import datetime
 import os
 from pathlib import Path
 from PIL import Image, ImageOps
-import sys
 from testsite.settings import MEDIA_ROOT, MEDIA_URL
 
 # Create your models here.

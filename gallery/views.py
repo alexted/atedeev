@@ -12,9 +12,6 @@ from .models import Elements
 #здесь показываем Категории
 def index(request, category_name):
     projects_list = Elements.objects.filter(category=category_name).order_by('-date_time')[:6]
- #   context = {
- #       'projects_list': projects_list,
- #   }
     page = request.GET.get('page', 1)
     paginator = Paginator(projects_list, 3)
     try:
