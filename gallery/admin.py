@@ -10,5 +10,9 @@ class PostPictureInline(admin.TabularInline):
 class ElementsAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug_header": ("header",)}
     inlines = [PostPictureInline, ]
+    list_display = ('header', 'date_time', 'category')
+    list_filter = ['date_time']
+    search_fields = ['']
 
 admin.site.register(Elements, ElementsAdmin)
+
