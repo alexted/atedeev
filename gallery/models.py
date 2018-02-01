@@ -3,7 +3,8 @@ import datetime
 import os
 from pathlib import Path
 from PIL import Image, ImageOps
-from testsite.settings import MEDIA_ROOT, MEDIA_URL
+from testsite.settings import MEDIA_ROOT, MEDIA_URL, BASE_DIR
+from django.utils.html import mark_safe
 
 # Create your models here.
 class Elements(models.Model):
@@ -29,6 +30,61 @@ class Elements(models.Model):
         default = "sites",
         blank = True
     )
+
+    def resize(self, width=None, height=None, type = 'jpg', qual = 90):
+        img = Image.open(self.preview_image)
+        if height is None:
+            basewidth = width
+            width_percent = (basewidth / float(img.size[0]))
+            height_size = int((float(img.size[1]) * float(width_percent)))
+            resized_img = img.resize((basewidth, height_size), Image.ANTIALIAS)
+        elif width is None:
+            baseheight = height
+            height_percent = (baseheight/ float(img.size[1]))
+            width_size = int((float(img.size[0]) * float(height_percent)))
+            resized_img = img.resize((width_size, baseheight), Image.ANTIALIAS)
+        else:
+            resized_img = ImageOps.fit(img, (width, height), Image.ANTIALIAS)
+        path = MEDIA_ROOT + "/preview_images/main_preview/%s-%s" % (width, height)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        path = path + "/%s.%s" % (self.pk, type)
+        if type == 'jpg':
+            resized_img.convert('RGB').save(path, quality=qual)
+        else:
+            resized_img.convert('RGB').save(path)
+
+    def save(self):
+
+        if not self.pk or not self.preview_image:
+            super(Elements, self).save()
+            self.resize(width=200)
+
+
+    def get_prev_url(self, width=None, height=None, type = 'jpg' ):
+        imgpath = "preview_images/main_preview/%s-%s/%s.%s" % (width, height, self.pk, type)
+        file = Path(MEDIA_ROOT+imgpath)
+        original_img = Path(BASE_DIR + self.preview_image.url)
+        print(original_img)
+        if self.preview_image and (original_img).exists():
+            if file.exists():
+                return MEDIA_URL+imgpath
+            else:
+                self.resize(width,height,type)
+                return MEDIA_URL+imgpath
+        else:
+            return ''
+
+    def get_prev_url_200(self):
+        return self.get_prev_url(width=200)
+
+    def get_prev_url_300(self):
+        return self.get_prev_url(width=300)
+
+    class Meta():
+        verbose_name = 'Проект'
+        verbose_name_plural = 'Проекты'
+
 
 def get_image_path(instance, filename):
     slug = instance.project.slug_header
@@ -84,5 +140,11 @@ class Images(models.Model):
             self.resize(width,height,type)
             return MEDIA_URL+imgpath
 
+    def get_prev_url_200(self):
+        return self.get_prev_url(width=200)
+
+    def show_preview(self):
+        return mark_safe('<img src="%s" alt="Картинка">' % (self.get_prev_url_200()))
+
     def get_prev_url_300(self):
-        return self.get_prev_url(width=600)
+        return mark_safe('<img src="%s" alt="Картинка">' % (self.get_prev_url(width=300)))

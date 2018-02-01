@@ -12,5 +12,9 @@ class Feedback(models.Model):
     datetime = models.DateTimeField(verbose_name="Дата", default=datetime.datetime.now)
     ip = models.GenericIPAddressField(verbose_name="IP адрес", null=True ,blank=True)
 
+    class Meta():
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
 
 

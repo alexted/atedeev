@@ -2,7 +2,7 @@
 {% if projects %}
     <ul>
     {% for project in projects%}
-        <li><a href="{% url 'gallery:detail' project.slug_header %}"><img src="/media/{{ project.preview_image }}" alt="Картинка"></a></li>
+        <li><a href="{% url 'gallery:detail' project.slug_header %}"><img src="{{ project.get_prev_url_300 }}" alt="Картинка"></a></li>
     {% endfor %}
     </ul>
 {% else %}

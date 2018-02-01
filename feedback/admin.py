@@ -6,6 +6,6 @@ from .models import Feedback
 class FeedbackAdmin(admin.ModelAdmin):
     list_display = ('name', 'datetime', 'email')
     list_filter = ['datetime']
-    search_fields = ['message']
+    search_fields = ['name', 'message', 'organization']
 
 admin.site.register(Feedback, FeedbackAdmin)
