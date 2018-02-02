@@ -1,17 +1,13 @@
 from django.shortcuts import get_object_or_404, render
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-####from django.http import Http404
 
 # Create your views here.
 
-####from django.http import HttpResponse
-####from django.template import loader
-
-from .models import Elements
+from .models import Project
 
 #здесь показываем Категории
 def index(request, category_name):
-    projects_list = Elements.objects.filter(category=category_name).order_by('-date_time')[:6]
+    projects_list = Project.objects.filter(category=category_name).order_by('-date_time')[:6]
     page = request.GET.get('page', 1)
     paginator = Paginator(projects_list, 3)
     try:
@@ -25,5 +21,5 @@ def index(request, category_name):
 
 #Здесь показываем проекты в зависимости от категории
 def detail(request, slug_header):
-    project = get_object_or_404(Elements, slug_header = slug_header)
+    project = get_object_or_404(Project, slug_header = slug_header)
     return render(request, 'gallery/detail.html', {'project': project})

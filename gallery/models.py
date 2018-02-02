@@ -3,21 +3,21 @@ import datetime
 import os
 from pathlib import Path
 from PIL import Image, ImageOps
-from testsite.settings import MEDIA_ROOT, MEDIA_URL, BASE_DIR
+from django.conf import settings
 from django.utils.html import mark_safe
 
 # Create your models here.
-class Elements(models.Model):
-    preview_image = models.ImageField(
+class Project(models.Model):
+    preview_screenshot = models.ImageField(
         verbose_name="Превью-Картинка",
-        upload_to="preview_images/%Y/%m/%d",
+        upload_to="Gallery/Project/preview_screenshot/%Y/%m/%d",
         help_text="Загрузите изображение",
         blank=True)
     header = models.CharField(verbose_name="Заголовок",max_length=300, blank=True)
     slug_header = models.SlugField(max_length=300, blank=True)
     description = models.TextField(verbose_name="Описание", blank=True)
-    url = models.CharField(verbose_name="Адрес сайта",blank=True, max_length=300)
-    date_time = models.DateTimeField(verbose_name="Дата", default=datetime.datetime.now)
+    url = models.URLField(verbose_name="Адрес сайта",blank=True)
+    creation_date_time = models.DateTimeField(verbose_name="Дата", default=datetime.datetime.now)
     category_choices = (
         ("sites", 'Сайты'),
         ("games", 'Игры'),
@@ -25,14 +25,14 @@ class Elements(models.Model):
     )
     category = models.CharField(
         verbose_name="Категория",
-        max_length = 30,
-        choices = category_choices,
-        default = "sites",
-        blank = True
+        max_length=30,
+        choices=category_choices,
+        default="sites",
+        blank=True
     )
 
-    def resize(self, width=None, height=None, type = 'jpg', qual = 90):
-        img = Image.open(self.preview_image)
+    def resize_image(self, width=None, height=None, type = 'jpg', qual = 90):
+        img = Image.open(self.preview_screenshot)
         if height is None:
             basewidth = width
             width_percent = (basewidth / float(img.size[0]))
@@ -45,7 +45,7 @@ class Elements(models.Model):
             resized_img = img.resize((width_size, baseheight), Image.ANTIALIAS)
         else:
             resized_img = ImageOps.fit(img, (width, height), Image.ANTIALIAS)
-        path = MEDIA_ROOT + "/preview_images/main_preview/%s-%s" % (width, height)
+        path = settings.MEDIA_ROOT + "Gallery/Project/preview_screenshot/resize_image/%s-%s" % (width, height)
         if not os.path.exists(path):
             os.makedirs(path)
         path = path + "/%s.%s" % (self.pk, type)
@@ -56,49 +56,52 @@ class Elements(models.Model):
 
     def save(self):
 
-        if not self.pk or not self.preview_image:
-            super(Elements, self).save()
-            self.resize(width=200)
+        if not self.pk or not self.preview_screenshot:
+            super(Project, self).save()
+            self.resize_image(width=200)
 
 
-    def get_prev_url(self, width=None, height=None, type = 'jpg' ):
-        imgpath = "preview_images/main_preview/%s-%s/%s.%s" % (width, height, self.pk, type)
-        file = Path(MEDIA_ROOT+imgpath)
-        original_img = Path(BASE_DIR + self.preview_image.url)
+    def get_resized_screenshot_url(self, width=None, height=None, type = 'jpg' ):
+        imgpath = "Gallery/Project/preview_screenshot/resize_image/%s-%s/%s.%s" % (width, height, self.pk, type)
+        file = Path(settings.MEDIA_ROOT+imgpath)
+        original_img = Path(settings.BASE_DIR + self.preview_screenshot.url)
         print(original_img)
-        if self.preview_image and (original_img).exists():
+        if self.preview_screenshot and (original_img).exists():
             if file.exists():
-                return MEDIA_URL+imgpath
+                return settings.MEDIA_URL+imgpath
             else:
-                self.resize(width,height,type)
-                return MEDIA_URL+imgpath
+                self.resize_image(width,height,type)
+                return settings.MEDIA_URL+imgpath
         else:
             return ''
 
-    def get_prev_url_200(self):
-        return self.get_prev_url(width=200)
+    def get_resized_screenshot_200(self):
+        return self.get_resized_screenshot_url(width=200)
 
-    def get_prev_url_300(self):
-        return self.get_prev_url(width=300)
+    def get_resized_screenshot_300(self):
+        return self.get_resized_screenshot_url(width=300)
 
     class Meta():
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
 
-
 def get_image_path(instance, filename):
     slug = instance.project.slug_header
     return "projects_images/%s/%s" % (slug, filename)
 
-class Images(models.Model):
-    project = models.ForeignKey(Elements, on_delete=models.CASCADE)
+class Video(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    video = models.URLField(verbose_name="Видео", blank=True)
+
+class Screenshot(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     image = models.ImageField(
         verbose_name = "Галерея проекта",
-        upload_to = get_image_path,
+        upload_to = "Gallery/Project/Screenshot/image/%Y/%m/%d",
         help_text="Загрузите изображения",
         blank=True)
 
-    def resize(self, width=None, height=None, type = 'jpg', qual = 90):
+    def resize_image(self, width=None, height=None, type = 'jpg', qual = 90):
         img = Image.open(self.image)
         if height is None:
             basewidth = width
@@ -112,7 +115,7 @@ class Images(models.Model):
             resized_img = img.resize((width_size, baseheight), Image.ANTIALIAS)
         else:
             resized_img = ImageOps.fit(img, (width, height), Image.ANTIALIAS)
-        path = MEDIA_ROOT + "/preview_images/%s-%s" % (width, height)
+        path = settings.MEDIA_ROOT + "Gallery/Project/Screenshot/resize_image/%s-%s" % (width, height)
         if not os.path.exists(path):
             os.makedirs(path)
         path = path + "/%s.%s" % (self.pk, type)
@@ -122,29 +125,25 @@ class Images(models.Model):
             resized_img.convert('RGB').save(path)
 
     def save(self):
-
         if not self.pk or not self.image:
-            super(Images, self).save()
-            self.resize(width=300)
-            self.resize(width=None, height=300)
-            self.resize(width=900,height=220)
-            self.resize(width=220, height=900)
-            self.resize(width=968, height=115)
+            super(Screenshot, self).save()
+            self.resize_image(width=300)
+            self.resize_image(width=None, height=300)
+            self.resize_image(width=900,height=220)
+            self.resize_image(width=220, height=900)
+            self.resize_image(width=968, height=115)
 
-    def get_prev_url(self, width=None, height=None, type = 'jpg' ):
-        imgpath = "preview_images/%s-%s/%s.%s" % (width, height, self.pk, type)
-        file = Path(MEDIA_ROOT+imgpath)
+    def get_resized_screenshot_url(self, width=None, height=None, type='jpg'):
+        imgpath = "Gallery/Project/Screenshot/resize_image/%s-%s/%s.%s" % (width, height, self.pk, type)
+        file = Path(settings.MEDIA_ROOT+imgpath)
         if file.exists():
-            return MEDIA_URL+imgpath
+            return settings.MEDIA_URL+imgpath
         else:
-            self.resize(width,height,type)
-            return MEDIA_URL+imgpath
+            self.resize_image(width,height,type)
+            return settings.MEDIA_URL+imgpath
 
-    def get_prev_url_200(self):
-        return self.get_prev_url(width=200)
+    def get_resized_screenshot_url_200(self):
+        return self.get_resized_screenshot_url(width=200)
 
-    def show_preview(self):
-        return mark_safe('<img src="%s" alt="Картинка">' % (self.get_prev_url_200()))
-
-    def get_prev_url_300(self):
-        return mark_safe('<img src="%s" alt="Картинка">' % (self.get_prev_url(width=300)))
+    def get_resized_screenshot_url_300(self):
+        return self.get_resized_screenshot_url(width=300)
