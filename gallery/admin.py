@@ -18,7 +18,7 @@ class ProjectVideoInline(admin.TabularInline):
 
 class ProjectAdmin(admin.ModelAdmin):
     def get_resized_preview_screenshot_html(self, obj):
-        return mark_safe('<img src="%s" alt="Картинка">' % (obj.get_resized_screenshot_url_200()))
+        return mark_safe('<img src="%s" alt="Картинка">' % (obj.get_resized_screenshot_200()))
 
     prepopulated_fields = {"slug_header": ("header",)}
     inlines = [ProjectPictureInline, ProjectVideoInline]

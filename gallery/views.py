@@ -7,7 +7,7 @@ from .models import Project
 
 #здесь показываем Категории
 def index(request, category_name):
-    projects_list = Project.objects.filter(category=category_name).order_by('-date_time')[:6]
+    projects_list = Project.objects.filter(category=category_name).order_by('creation_date_time')[:6]
     page = request.GET.get('page', 1)
     paginator = Paginator(projects_list, 3)
     try:

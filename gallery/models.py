@@ -45,7 +45,7 @@ class Project(models.Model):
             resized_img = img.resize((width_size, baseheight), Image.ANTIALIAS)
         else:
             resized_img = ImageOps.fit(img, (width, height), Image.ANTIALIAS)
-        path = settings.MEDIA_ROOT + "Gallery/Project/preview_screenshot/resize_image/%s-%s" % (width, height)
+        path = settings.MEDIA_ROOT + "/Gallery/Project/preview_screenshot/resize_image/%s-%s" % (width, height)
         if not os.path.exists(path):
             os.makedirs(path)
         path = path + "/%s.%s" % (self.pk, type)
@@ -62,7 +62,7 @@ class Project(models.Model):
 
 
     def get_resized_screenshot_url(self, width=None, height=None, type = 'jpg' ):
-        imgpath = "Gallery/Project/preview_screenshot/resize_image/%s-%s/%s.%s" % (width, height, self.pk, type)
+        imgpath = "/Gallery/Project/preview_screenshot/resize_image/%s-%s/%s.%s" % (width, height, self.pk, type)
         file = Path(settings.MEDIA_ROOT+imgpath)
         original_img = Path(settings.BASE_DIR + self.preview_screenshot.url)
         print(original_img)
@@ -115,7 +115,7 @@ class Screenshot(models.Model):
             resized_img = img.resize((width_size, baseheight), Image.ANTIALIAS)
         else:
             resized_img = ImageOps.fit(img, (width, height), Image.ANTIALIAS)
-        path = settings.MEDIA_ROOT + "Gallery/Project/Screenshot/resize_image/%s-%s" % (width, height)
+        path = settings.MEDIA_ROOT + "/Gallery/Project/Screenshot/resize_image/%s-%s" % (width, height)
         if not os.path.exists(path):
             os.makedirs(path)
         path = path + "/%s.%s" % (self.pk, type)
@@ -134,7 +134,7 @@ class Screenshot(models.Model):
             self.resize_image(width=968, height=115)
 
     def get_resized_screenshot_url(self, width=None, height=None, type='jpg'):
-        imgpath = "Gallery/Project/Screenshot/resize_image/%s-%s/%s.%s" % (width, height, self.pk, type)
+        imgpath = "/Gallery/Project/Screenshot/resize_image/%s-%s/%s.%s" % (width, height, self.pk, type)
         file = Path(settings.MEDIA_ROOT+imgpath)
         if file.exists():
             return settings.MEDIA_URL+imgpath
