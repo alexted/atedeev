@@ -125,9 +125,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR,"media")
 MEDIA_URL = '/media/'
 
 #Email-server configuration
-EMAIL_HOST = '127.0.0.1'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'info@epsilon-design.ru'
+EMAIL_HOST = 'localhost'
 EMAIL_PORT = '1025'
-#EMAIL_HOST_USER =
-#EMAIL_HOST_PASSWORD =
-#EMAIL_USE_TLS = True
-#EMAIL_BACKEND = ''
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False

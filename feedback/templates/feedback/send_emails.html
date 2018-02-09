@@ -31,16 +31,21 @@
 <form method="POST" action="{% url 'feedback:send_emails' %}">{% csrf_token %}
     <div>
         <div>
-            <p>{{ form.receivers.errors }}</p>
-            <p>{{ form.receivers.label_tag }}</p>
+            <p>{{ form.sender.errors }}</p>
+            <p>{{ form.sender.label_tag }}</p>
+            <p>{{ form.sender }}</p>
+        </div>
+        <div>
+            <p>{{ form.recipients.errors }}</p>
+            <p>{{ form.recipients.label_tag }}</p>
             <p>
-                {% for receiver in form.receivers.initial %}
-                    {{ receiver.email }}{% if not forloop.last %},&nbsp;{% endif %}
+                {% for recipient in form.recipients.initial %}
+                    {{ recipient.email }}{% if not forloop.last %},&nbsp;{% endif %}
                 {% endfor %}
             </p>
-            <select name="receivers" multiple style="display: none">
-                {% for receiver in form.receivers.initial %}
-                    <option value="{{ receiver.id }}" selected>{{ receiver }}</option>
+            <select name="recipients" multiple style="display: none">
+                {% for recipient in form.recipients.initial %}
+                    <option value="{{ recipient.id }}" selected>{{ recipient }}</option>
                 {% endfor %}
             </select>
         </div>

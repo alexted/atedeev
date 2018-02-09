@@ -1,8 +1,9 @@
-from django.shortcuts import get_object_or_404, render
-from .forms import FeedbackForm, SendMassEmail
+from django.shortcuts import get_object_or_404, render, HttpResponse
+from .forms import FeedbackForm, SendEmailForm
 from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.core.mail import send_mail, BadHeaderError
 # Create your views here.
 
 def index(request):
@@ -28,26 +29,22 @@ def index(request):
         form = FeedbackForm()
         return render(request, 'feedback/index.html', {'form': form})
 
-class SendUserEmails(FormView):
+class SendEmailView(FormView):
     template_name = 'feedback/send_emails.html'
-    form_class = SendMassEmail
+    form_class = SendEmailForm
     success_url = reverse_lazy('admin:feedback_feedback_changelist')
 
     def form_valid(self, form):
-        user_message = '{0} users emailed successfully!'.format(form.cleaned_data['receivers'].count())
+        recipients=[i.email for i in form.cleaned_data['recipients']]
+        sender = form.cleaned_data['sender']
+        subject = form.cleaned_data['subject']
+        message = form.cleaned_data['message']
+        user_message = '{0} users emailed successfully!'.format(form.cleaned_data['recipients'].count())
         messages.success(self.request, user_message)
-        form.send_email()
-        return super(SendUserEmails, self).form_valid(form)
-
-# def send_emails(request):
-#     if request.method == 'POST':
-#         form = SendMassEmail(request.POST)
-#         context = {'form' : form}
-#         if form.is_valid():
-#             connection = mail.get_connection()
-#             #messages = get_notific
-#             context['Письма отправлены'] = True
-#             return render(request,'feedback/send_emails.html', context)
-#     else:
-#         form = SendMassEmail()
-#         return render(request, 'feedback/send_emails.html', {'form': form})
+        try:
+            print(recipients)
+            print(recipients)
+            send_mail(subject, message, sender, recipients, fail_silently= False)
+        except BadHeaderError:
+            return HttpResponse('Invalid header found.')
+        return super(SendEmailView, self).form_valid(form)
