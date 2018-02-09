@@ -11,12 +11,12 @@ class FeedbackForm(ModelForm):
 
 class SendEmailForm(forms.Form):
     subject = forms.CharField(
-        label='Тема письма',
+        label='Тема:',
         widget=forms.TextInput(attrs={'placeholder': 'Укажите тему'}),
     )
-    message = forms.CharField( label='Текст письма', widget=forms.Textarea(attrs={'placeholder':'Введите текст'}))
-    sender = forms.CharField(label='Отправитель',widget=forms.TextInput(attrs={'placeholder': 'Укажите email отправителя'}))
-    recipients = forms.ModelMultipleChoiceField(label="Кому",
+    message = forms.CharField( label='Текст письма:', widget=forms.Textarea(attrs={'placeholder':'Введите текст'}))
+    sender = forms.CharField(label='Отправитель:',widget=forms.TextInput(attrs={'placeholder': 'Укажите email отправителя'}))
+    recipients = forms.ModelMultipleChoiceField(label="Кому:",
                                            queryset=Feedback.objects.only('email'),
                                            widget=forms.SelectMultiple(),
                                            )
